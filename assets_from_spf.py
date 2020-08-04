@@ -1,4 +1,3 @@
-from __future__ import print_function
 import sys
 import re
 import json
@@ -28,12 +27,13 @@ logger = logging.getLogger('%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 def get_spf_record(domain):
     try:
-        answers = dns.resolver.query(domain, 'TXT', raise_on_no_answer=False)
+        answers = dns.resolver.resolve(domain, 'TXT', raise_on_no_answer=False)
     except dns.resolver.NXDOMAIN:
         logger.info("[+] Couldn't resolve the domain {}".format(domain))
         sys.exit(1)
     for rdata in answers:
-        for record in rdata.strings:
+        fixedRecords = [(b''.join(rdata.strings)).decode("utf-8")]
+        for record in fixedRecords:
             if 'spf1' in record:
                 spf_record=record
     if 'spf_record' in locals():
